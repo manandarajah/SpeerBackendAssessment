@@ -24,7 +24,8 @@ var data = {
   name: "",
   dir: "",
   balance: 0,
-  transactions: []
+  transactions: [],
+  portfolioValue: 0
 };
 
 const clientSchema = mongoose.Schema({
@@ -91,6 +92,7 @@ app.post('/buystock', function(req, res) {
   };
 
   data.transactions.push(stockTransaction);
+  data.portfolioValue += stockTransaction.shares * stockTransaction.price;
   res.redirect('/');
 });
 
@@ -103,7 +105,8 @@ app.post('/logout', function(req, res) {
     name: "",
     dir: "",
     balance: 0,
-    transactions: []
+    transactions: [],
+    portfolioValue: 0
   };
   res.redirect('/');
 });
