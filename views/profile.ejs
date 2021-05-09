@@ -18,8 +18,8 @@
           <tr>
             <td><%= transactions[i].symbol %></td>
             <td><%= transactions[i].shares %></td>
-            <td><%= transactions[i].price %></td>
-            <td><%= transactions[i].shares * transactions[i].price %></td>
+            <td>$<%= transactions[i].price %></td>
+            <td>$<%= transactions[i].shares * transactions[i].price %></td>
           </tr>
         <% } %>
       </table>

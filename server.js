@@ -45,6 +45,7 @@ app.get('/', function(req, res) {
 });
 
 app.post('/', async function(req, res) {
+  data.errorOccured = false;
   var username = req.body.username, password = req.body.password;
 
   console.log(req.body);
@@ -67,6 +68,7 @@ app.post('/', async function(req, res) {
 });
 
 app.post('/addbalance', function(req, res) {
+  data.errorOccured = false;
   data.balance += parseFloat(req.body.newbalance);
 
   Client.updateOne({'username': data.username}, {'balance': data.balance}, function(err) {
@@ -81,18 +83,30 @@ app.post('/addbalance', function(req, res) {
 });
 
 app.get('/profile', function(req, res) {
+  data.errorOccured = false;
   res.render('profile', data);
 });
 
 app.post('/buystock', function(req, res) {
+  data.errorOccured = false;
+
   var stockTransaction = {
     symbol: req.body.symbol,
     shares: parseInt(req.body.shares),
     price: parseFloat(req.body.price)
   };
 
-  data.transactions.push(stockTransaction);
-  data.portfolioValue += stockTransaction.shares * stockTransaction.price;
+  var totalPrice = stockTransaction.shares * stockTransaction.price;
+
+  if (data.balance - totalPrice >= 0) {
+    data.transactions.push(stockTransaction);
+    data.portfolioValue += totalPrice;
+    data.balance -= totalPrice;
+  }
+
+  else {
+    data.errorOccured = true;
+  }
   res.redirect('/');
 });
 

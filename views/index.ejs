@@ -11,6 +11,9 @@
       <h1><a href="/profile" ><%= name %></a></h1>
 
       <!-- Add Balance Form -->
+      <% if (errorOccured) { %>
+        <p style="color: red">Insufficient funds! Please add more money.</p>
+      <% } %>
       <form class="" action="/addbalance" method="post">
         <p>
           <strong>Balance:</strong> $<%= balance %>
