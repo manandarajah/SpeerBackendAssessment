@@ -18,11 +18,13 @@ mongoose.connect(process.env.DBHOST + process.env.DB, {useNewUrlParser: true, us
 
 //Stores all data that EJS files will need to keep it organized and allowing us to manipulate data that's necessary rather than all data
 var data = {
+  username: "",
   isLoggedIn: false,
   errorOccured: false,
   name: "",
   dir: "",
-}
+  balance: 0
+};
 
 const clientSchema = mongoose.Schema({
   username: String,
@@ -49,8 +51,10 @@ app.post('/', async function(req, res) {
 
   if (client != null) {
     data.isLoggedIn = true;
+    data.username = client.username;
     data.name = client.firstname + " " + client.lastname;
     data.dir = req.protocol + '://' + req.get('host');
+    data.balance = client.balance;
     res.render('index', data);
   }
 
@@ -60,9 +64,24 @@ app.post('/', async function(req, res) {
   }
 });
 
+app.post('/addbalance', function(req, res) {
+  data.balance += parseFloat(req.body.newbalance);
+
+  Client.updateOne({'username': data.username}, {'balance': data.balance}, function(err) {
+    if (err) {
+      console.log("error has occured");
+    }
+
+    console.log("new balance updated to client account");
+  });
+
+  res.redirect('/');
+});
+
 app.post('/logout', function(req, res) {
   console.log("Logging out of client account");
   data = {
+    username: "",
     isLoggedIn: false,
     errorOccured: false,
     name: "",
@@ -70,6 +89,10 @@ app.post('/logout', function(req, res) {
     balance: 0
   };
   res.redirect('/');
+});
+
+app.get('/profile', function(req, res) {
+  res.render('profile', data);
 });
 
 app.listen(process.env.PORT || 3000, function() {

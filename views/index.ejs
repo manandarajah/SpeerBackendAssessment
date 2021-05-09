@@ -3,18 +3,17 @@
   <head>
     <meta charset="utf-8">
     <title>EJS - Speer Backend Assessment Task 2</title>
-    <script type="text/javascript">
-      var isLoggedIn = <%= isLoggedIn %>;
-      var errorOccured = <%= errorOccured %>;
-      var name = "<%= name %>";
-      var dir = "<%= dir %>";
-      var balance = <%= balance %>;
-    </script>
   </head>
   <body>
     <% if (isLoggedIn) { %>
-      <h1><a href="#"><%= name %></a></h1>
-      <p><strong>Balance:</strong> $<%= balance %></p>
+      <h1><a href="/profile" ><%= name %></a></h1>
+      <form class="" action="/addbalance" method="post">
+        <p>
+          <strong>Balance:</strong> $<%= balance %>
+          <input type="number" step="0.01" name="newbalance"/>
+          <input type="submit" name="" value="Add Balance"/>
+        </p>
+      </form>
       <form class="" action="/logout" method="post">
         <input type="submit" name="" value="Log out" />
       </form>
