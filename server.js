@@ -26,8 +26,10 @@ const clientSchema = mongoose.Schema({
 
 const Client = mongoose.model("client", clientSchema);
 
-app.get('/', async function(req, res) {
-  res.sendFile(__dirname + '/index.html');
+app.get('/', function(req, res) {
+  console.log("should call ejs");
+
+  res.render('index', {isLoggedIn: false, errorOccured: false});
 });
 
 app.post('/', async function(req, res) {
@@ -35,11 +37,19 @@ app.post('/', async function(req, res) {
 
   console.log(req.body);
 
-  var client = await Client.find({'username': username, 'password': password}).exec();
+  var client = await Client.findOne({'username': username, 'password': password}).exec();
 
   if (client != null) {
-
+    res.render('index', {isLoggedIn: true, errorOccured: false});
   }
+
+  else {
+    res.render('index', {isLoggedIn: false, errorOccured: true});
+  }
+});
+
+app.post('/logout', function(req, res) {
+  res.render('index', {isLoggedIn: false, errorOccured: false});
 });
 
 app.listen(process.env.PORT || 3000, function() {
