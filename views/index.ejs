@@ -6,19 +6,26 @@
     <script type="text/javascript">
       var isLoggedIn = <%= isLoggedIn %>;
       var errorOccured = <%= errorOccured %>;
+      var name = "<%= name %>";
+      var dir = "<%= dir %>";
+      var balance = <%= balance %>;
     </script>
   </head>
   <body>
     <% if (isLoggedIn) { %>
-      <h1>I can log in</h1>
+      <h1><a href="#"><%= name %></a></h1>
+      <p><strong>Balance:</strong> $<%= balance %></p>
+      <form class="" action="/logout" method="post">
+        <input type="submit" name="" value="Log out" />
+      </form>
     <% } else {
           if (errorOccured) {%>
-            <p style="color: red;">Can't find the user you're looking for</p>
+            <p style="color: red;">Invalid user! Please try again.</p>
           <% } %>
       <form class="" action="/" method="post">
         <input type="text" name="username" value="" placeholder="enter username">
         <input type="password" name="password" value=""placeholder="enter password">
-        <input type="submit" name="" value="Submit">
+        <input type="submit" name="" value="Log in">
       </form>
     <% } %>
   </body>
