@@ -21,6 +21,7 @@ var data = {
   username: "",
   isLoggedIn: false,
   errorOccured: false,
+  errorMessage: "",
   name: "",
   dir: "",
   balance: 0,
@@ -58,13 +59,14 @@ app.post('/', async function(req, res) {
     data.name = client.firstname + " " + client.lastname;
     data.dir = req.protocol + '://' + req.get('host');
     data.balance = client.balance;
-    res.render('index', data);
   }
 
   else {
     data.errorOccured = true;
-    res.render('index', data);
+    data.errorMessage = "Invalid user! Please try again";
   }
+
+  res.render('index', data);
 });
 
 app.post('/addbalance', function(req, res) {
@@ -102,11 +104,76 @@ app.post('/buystock', function(req, res) {
     data.transactions.push(stockTransaction);
     data.portfolioValue += totalPrice;
     data.balance -= totalPrice;
+
+    Client.updateOne({'username': data.username}, {'balance': data.balance}, function(err) {
+      if (err) {
+        console.log("an error has occured!");
+      }
+
+      console.log("buy transaction successful!");
+    });
   }
 
   else {
     data.errorOccured = true;
+    data.errorMessage = "Insufficient funds! Please try again.";
   }
+  res.redirect('/');
+});
+
+app.post('/sellstock', function(req, res) {
+  var stockTransaction = {
+    symbol: req.body.symbol,
+    shares: parseInt(req.body.shares),
+    price: parseFloat(req.body.price)
+  };
+
+  var transaction = data.transactions.find(() => {
+    return stockTransaction.symbol;
+  });
+
+  if (transaction == null) {
+    data.errorOccured = true;
+    data.errorMessage = "Can't find symbol!";
+  }
+
+  else {
+    var sharesDifference = transaction.shares - stockTransaction.shares;
+    var priceDifference = transaction.price - stockTransaction.price;
+    var balanceDifference = data.balance - (stockTransaction.shares * stockTransaction.price);
+
+    if (sharesDifference >= 0 && priceDifference >= 0 && balanceDifference >= 0) {
+      transaction.shares -= stockTransaction.shares;
+      transaction.price -= stockTransaction.price;
+      data.balance -= stockTransaction.shares * stockTransaction.price;
+
+      Client.updateOne({'username': data.username}, {'balance': data.balance}, function(err) {
+        if (err) {
+          console.log("an error has occured!");
+        }
+
+        console.log("buy transaction successful!");
+      });
+    }
+
+    else {
+      if (sharesDifference < 0) {
+        data.errorOccured = true;
+        data.errorMessage = "Insufficient shares!";
+      }
+
+      else if (priceDifference < 0) {
+        data.errorOccured = true;
+        data.errorMessage = "Insufficient price!";
+      }
+
+      else if (balanceDifference < 0) {
+        data.errorOccured = true;
+        data.errorMessage = "Insufficient funds!";
+      }
+    }
+  }
+
   res.redirect('/');
 });
 
@@ -116,6 +183,7 @@ app.post('/logout', function(req, res) {
     username: "",
     isLoggedIn: false,
     errorOccured: false,
+    errorMessage: "",
     name: "",
     dir: "",
     balance: 0,
