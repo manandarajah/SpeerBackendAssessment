@@ -23,7 +23,8 @@ var data = {
   errorOccured: false,
   name: "",
   dir: "",
-  balance: 0
+  balance: 0,
+  transactions: []
 };
 
 const clientSchema = mongoose.Schema({
@@ -78,6 +79,21 @@ app.post('/addbalance', function(req, res) {
   res.redirect('/');
 });
 
+app.get('/profile', function(req, res) {
+  res.render('profile', data);
+});
+
+app.post('/buystock', function(req, res) {
+  var stockTransaction = {
+    symbol: req.body.symbol,
+    shares: parseInt(req.body.shares),
+    price: parseFloat(req.body.price)
+  };
+
+  data.transactions.push(stockTransaction);
+  res.redirect('/');
+});
+
 app.post('/logout', function(req, res) {
   console.log("Logging out of client account");
   data = {
@@ -86,13 +102,10 @@ app.post('/logout', function(req, res) {
     errorOccured: false,
     name: "",
     dir: "",
-    balance: 0
+    balance: 0,
+    transactions: []
   };
   res.redirect('/');
-});
-
-app.get('/profile', function(req, res) {
-  res.render('profile', data);
 });
 
 app.listen(process.env.PORT || 3000, function() {

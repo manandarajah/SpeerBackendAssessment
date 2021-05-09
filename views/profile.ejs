@@ -7,5 +7,21 @@
   <body>
       <h1><%= name %></h1>
       <h3>This is the client's portfolio</h3>
+      <table style="text-align: center">
+        <tr>
+          <th>Symbol</th>
+          <th># of shares</th>
+          <th>Stock price</th>
+          <th>Stock total</th>
+        </tr>
+        <% for (var i = 0; i < transactions.length; ++i) { %>
+          <tr>
+            <td><%= transactions[i].symbol %></td>
+            <td><%= transactions[i].shares %></td>
+            <td><%= transactions[i].price %></td>
+            <td><%= transactions[i].shares * transactions[i].price %></td>
+          </tr>
+        <% } %>
+      </table>
   </body>
 </html>

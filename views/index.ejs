@@ -5,27 +5,49 @@
     <title>EJS - Speer Backend Assessment Task 2</title>
   </head>
   <body>
+
+    <!-- User dashboard -->
     <% if (isLoggedIn) { %>
       <h1><a href="/profile" ><%= name %></a></h1>
+
+      <!-- Add Balance Form -->
       <form class="" action="/addbalance" method="post">
         <p>
           <strong>Balance:</strong> $<%= balance %>
-          <input type="number" step="0.01" name="newbalance"/>
+          <input type="number" step="0.01" name="newbalance" required/>
           <input type="submit" name="" value="Add Balance"/>
         </p>
       </form>
+
+      <!-- Buy/Sell Stocks Form -->
+      <form class="" action="/buystock" method="post">
+        <p>
+          <strong>Symbol: </strong>
+          <input type="text" name="symbol" value="" required>
+          <strong># of shares: </strong>
+          <input type="number" name="shares" value="" required>
+          <strong>Stock Price: $</strong>
+          <input type="number" step="0.01" name="price" value="" required>
+          <input type="submit" name="" value="Buy Stock">
+        </p>
+      </form>
+
+      <!-- Logout Form -->
       <form class="" action="/logout" method="post">
         <input type="submit" name="" value="Log out" />
       </form>
+
+    <!-- Login section -->
     <% } else {
           if (errorOccured) {%>
             <p style="color: red;">Invalid user! Please try again.</p>
           <% } %>
       <form class="" action="/" method="post">
-        <input type="text" name="username" value="" placeholder="enter username">
-        <input type="password" name="password" value=""placeholder="enter password">
+        <input type="text" name="username" value="" placeholder="enter username" required>
+        <input type="password" name="password" value=""placeholder="enter password" required>
         <input type="submit" name="" value="Log in">
       </form>
     <% } %>
+
   </body>
 </html>
