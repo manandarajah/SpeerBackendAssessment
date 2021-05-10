@@ -152,7 +152,10 @@ app.post('/sellstock', async function(req, res) {
                         .then(response => response.json())
                         .then(json => json["Global Quote"]);
 
+    console.log(stockTransaction.symbol + " " + stockTransaction.symbol.length);
+
     if (Object.keys(quote).length == 0) throw "Can't find symbol!";
+    else if (quote == null) throw "Something unexpected happened! Please try again later!";
 
     var transaction = data.transactions.find(() => {
       return stockTransaction.symbol;
@@ -177,7 +180,7 @@ app.post('/sellstock', async function(req, res) {
 
     if (transaction.shares == 0) {
       data.transactions = data.transactions.filter((transaction, index) => {
-        return data.transactions[index] != transaction;
+        return data.transactions[index].shares !== 0;
       });
     }
 
@@ -186,7 +189,7 @@ app.post('/sellstock', async function(req, res) {
         console.log("an error has occured!");
       }
 
-      console.log("buy transaction successful!");
+      console.log("sell transaction successful!");
     });
   } catch(err) {
     data.errorOccured = true;
