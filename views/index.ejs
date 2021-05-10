@@ -6,11 +6,15 @@
     <script type="text/javascript">
 
       function getQuote(id) {
-        document.getElementById("stockquote").innerHTML = "";
-        document.getElementById(id+"price").value = "";
         var symbol = document.getElementById(id+"symbol").value;
+        document.getElementById("stockquote").innerHTML = "";
 
-        fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+symbol+'&apikey=QW26G9WHDSW4XMUB')
+        if (symbol == "") {
+          document.getElementById(id+"price").value = "";
+          document.getElementById(id+"price").disabled = false;
+        }
+
+        fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+symbol+'&apikey=<%= apiKey %>')
           .then(response => response.json())
           .then(json => json["Global Quote"])
           .then(quote => {
@@ -28,21 +32,20 @@
               +"<strong>Change:</strong> "+quote["09. change"]+"<br>"
               +"<strong>Change Percent:</strong> "+quote["10. change percent"]+"<br>";
 
-              document.getElementById("stockquote").innerHTML = content;
-              document.getElementById(id+"price").value = price;
+              var stockquote = document.getElementById("stockquote");
+              var priceDoc = document.getElementById(id+"price");
+
+              if (stockquote.innerHTML == "") stockquote.innerHTML = content;
+              priceDoc.value = price;
+              priceDoc.disabled = true;
             }
 
             else {
               document.getElementById("stockquote").innerHTML = "<p style='color: red'>Can't find symbol!</p>";
               document.getElementById(id+"price").value = "";
+              document.getElementById(id+"price").disabled = false;
             }
           });
-      }
-
-      function getStockPrice(id) {
-        var symbol = document.getElementById(id+"symbol").value;
-
-
       }
     </script>
   </head>
@@ -64,6 +67,9 @@
         </p>
       </form>
 
+      <!-- The buy stock and sell stock features both have the ability to get stock quote
+           and live rates while user is buying or selling a stock -->
+
       <!-- Buy Stocks Form -->
       <form class="" action="/buystock" method="post">
         <p>
@@ -72,7 +78,7 @@
           <strong># of shares: </strong>
           <input type="number" name="shares" required>
           <strong>Stock Price: $</strong>
-          <input id="buyprice" type="number" step="0.01" name="price" required disabled>
+          <input id="buyprice" type="number" step="0.01" name="price" required>
           <input type="submit" name="" value="Buy Stock">
         </p>
       </form>
@@ -85,7 +91,7 @@
           <strong># of shares: </strong>
           <input type="number" name="shares" required>
           <strong>Stock Price: $</strong>
-          <input id="sellprice" type="number" step="0.01" name="price" required disabled>
+          <input id="sellprice" type="number" step="0.01" name="price" required>
           <input type="submit" name="" value="Sell Stock">
         </p>
       </form>

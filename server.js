@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const mongoose = require('mongoose');
+const fetch = require('node-fetch');
 
 const app = express();
 
@@ -18,6 +19,7 @@ mongoose.connect(process.env.DBHOST + process.env.DB, {useNewUrlParser: true, us
 
 //Stores all data that EJS files will need to keep it organized and allowing us to manipulate data that's necessary rather than all data
 var data = {
+  apiKey: "QW26G9WHDSW4XMUB",
   username: "",
   isLoggedIn: false,
   errorOccured: false,
@@ -89,7 +91,7 @@ app.get('/profile', function(req, res) {
   res.render('profile', data);
 });
 
-app.post('/buystock', function(req, res) {
+app.post('/buystock', async function(req, res) {
   try {
     data.errorOccured = false;
 
@@ -98,6 +100,12 @@ app.post('/buystock', function(req, res) {
       shares: parseInt(req.body.shares),
       price: parseFloat(req.body.price)
     };
+
+    var quote = await fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+stockTransaction.symbol+'&apikey='+data.apiKey)
+                        .then(response => response.json())
+                        .then(json => json["Global Quote"]);
+
+    if (Object.keys(quote).length == 0) throw "Can't find symbol!";
 
     var totalPrice = stockTransaction.shares * stockTransaction.price;
 
@@ -122,13 +130,19 @@ app.post('/buystock', function(req, res) {
   res.redirect('/');
 });
 
-app.post('/sellstock', function(req, res) {
+app.post('/sellstock', async function(req, res) {
   try {
     var stockTransaction = {
       symbol: req.body.symbol,
       shares: parseInt(req.body.shares),
       price: parseFloat(req.body.price)
     };
+
+    var quote = await fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+stockTransaction.symbol+'&apikey='+data.apiKey)
+                        .then(response => response.json())
+                        .then(json => json["Global Quote"]);
+
+    if (Object.keys(quote).length == 0) throw "Can't find symbol!";
 
     var transaction = data.transactions.find(() => {
       return stockTransaction.symbol;
