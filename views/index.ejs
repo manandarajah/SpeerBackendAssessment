@@ -3,6 +3,48 @@
   <head>
     <meta charset="utf-8">
     <title>EJS - Speer Backend Assessment Task 2</title>
+    <script type="text/javascript">
+
+      function getQuote(id) {
+        document.getElementById("stockquote").innerHTML = "";
+        document.getElementById(id+"price").value = "";
+        var symbol = document.getElementById(id+"symbol").value;
+
+        fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+symbol+'&apikey=QW26G9WHDSW4XMUB')
+          .then(response => response.json())
+          .then(json => json["Global Quote"])
+          .then(quote => {
+            if (Object.keys(quote).length > 0) {
+              var price = quote["05. price"];
+
+              var content = "<strong>Symbol: </strong>"+symbol+"<br>"
+              +"<strong>Open Price:</strong> "+quote["02. open"]+"<br>"
+              +"<strong>High Price:</strong> "+quote["03. high"]+"<br>"
+              +"<strong>Low Price:</strong> "+quote["04. low"]+"<br>"
+              +"<strong>Price:</strong> "+price+"<br>"
+              +"<strong>Volume:</strong> "+quote["06. volume"]+"<br>"
+              +"<strong>Latest Trading Day:</strong> "+quote["07. latest trading day"]+"<br>"
+              +"<strong>Previous close:</strong> "+quote["08. previous close"]+"<br>"
+              +"<strong>Change:</strong> "+quote["09. change"]+"<br>"
+              +"<strong>Change Percent:</strong> "+quote["10. change percent"]+"<br>";
+
+              document.getElementById("stockquote").innerHTML = content;
+              document.getElementById(id+"price").value = price;
+            }
+
+            else {
+              document.getElementById("stockquote").innerHTML = "<p style='color: red'>Can't find symbol!</p>";
+              document.getElementById(id+"price").value = "";
+            }
+          });
+      }
+
+      function getStockPrice(id) {
+        var symbol = document.getElementById(id+"symbol").value;
+
+
+      }
+    </script>
   </head>
   <body>
 
@@ -26,11 +68,11 @@
       <form class="" action="/buystock" method="post">
         <p>
           <strong>Symbol: </strong>
-          <input type="text" name="symbol" value="" required>
+          <input id="buysymbol" type="text" onchange="getQuote('buy')" name="symbol" required>
           <strong># of shares: </strong>
-          <input type="number" name="shares" value="" required>
+          <input type="number" name="shares" required>
           <strong>Stock Price: $</strong>
-          <input type="number" step="0.01" name="price" value="" required>
+          <input id="buyprice" type="number" step="0.01" name="price" required disabled>
           <input type="submit" name="" value="Buy Stock">
         </p>
       </form>
@@ -39,14 +81,18 @@
       <form class="" action="/sellstock" method="post">
         <p>
           <strong>Symbol: </strong>
-          <input type="text" name="symbol" value="" required>
+          <input id="sellsymbol" type="text" onchange="getQuote('sell')" name="symbol" required>
           <strong># of shares: </strong>
-          <input type="number" name="shares" value="" required>
+          <input type="number" name="shares" required>
           <strong>Stock Price: $</strong>
-          <input type="number" step="0.01" name="price" value="" required>
+          <input id="sellprice" type="number" step="0.01" name="price" required disabled>
           <input type="submit" name="" value="Sell Stock">
         </p>
       </form>
+
+      <!-- Get Stock Quote Endpoint -->
+      <strong>Stock Quote: </strong><br>
+      <div id="stockquote"></div>
 
       <!-- Logout Form -->
       <form class="" action="/logout" method="post">
