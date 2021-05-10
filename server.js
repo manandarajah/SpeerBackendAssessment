@@ -23,7 +23,6 @@ var data = {
   errorOccured: false,
   errorMessage: "",
   name: "",
-  dir: "",
   balance: 0,
   transactions: [],
   portfolioValue: 0
@@ -60,7 +59,6 @@ app.post('/', async function(req, res) {
     data.isLoggedIn = true;
     data.username = client.username;
     data.name = client.firstname + " " + client.lastname;
-    data.dir = req.protocol + '://' + req.get('host');
     data.balance = client.balance;
 
   } catch(err) {
@@ -181,7 +179,6 @@ app.post('/logout', function(req, res) {
     errorOccured: false,
     errorMessage: "",
     name: "",
-    dir: "",
     balance: 0,
     transactions: [],
     portfolioValue: 0
