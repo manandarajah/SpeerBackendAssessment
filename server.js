@@ -202,6 +202,7 @@ app.post('/logout', function(req, res) {
 
   //Resets the data attribute before logging out
   data = {
+    apiKey: "QW26G9WHDSW4XMUB",
     username: "",
     isLoggedIn: false,
     errorOccured: false,
