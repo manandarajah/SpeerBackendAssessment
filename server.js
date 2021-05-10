@@ -152,6 +152,12 @@ app.post('/sellstock', function(req, res) {
     transaction.price -= stockTransaction.price;
     data.balance -= stockTransaction.shares * stockTransaction.price;
 
+    if (transaction.shares == 0) {
+      data.transactions = data.transactions.filter((transaction, index) => {
+        return data.transactions[index] != transaction;
+      });
+    }
+
     Client.updateOne({'username': data.username}, {'balance': data.balance}, function(err) {
       if (err) {
         console.log("an error has occured!");
