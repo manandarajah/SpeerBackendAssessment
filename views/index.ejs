@@ -11,7 +11,7 @@
 
         if (symbol == "") {
           document.getElementById(id+"price").value = "";
-          document.getElementById(id+"price").disabled = false;
+          document.getElementById(id+"price").readOnly = false;
         }
 
         fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+symbol+'&apikey=<%= apiKey %>')
@@ -37,13 +37,13 @@
 
               if (stockquote.innerHTML == "") stockquote.innerHTML = content;
               priceDoc.value = price;
-              priceDoc.disabled = true;
+              priceDoc.readOnly = true;
             }
 
             else {
               document.getElementById("stockquote").innerHTML = "<p style='color: red'>Can't find symbol!</p>";
               document.getElementById(id+"price").value = "";
-              document.getElementById(id+"price").disabled = false;
+              document.getElementById(id+"price").readOnly = false;
             }
           });
       }
