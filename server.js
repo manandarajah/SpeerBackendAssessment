@@ -46,24 +46,26 @@ app.get('/', function(req, res) {
 });
 
 app.post('/', async function(req, res) {
-  data.errorOccured = false;
-  var username = req.body.username, password = req.body.password;
 
-  console.log(req.body);
+  try {
+    data.errorOccured = false;
+    var username = req.body.username, password = req.body.password;
 
-  var client = await Client.findOne({'username': username, 'password': password}).exec();
+    console.log(req.body);
 
-  if (client != null) {
+    var client = await Client.findOne({'username': username, 'password': password}).exec();
+
+    if (client == null) throw "Invalid user! Please try again";
+
     data.isLoggedIn = true;
     data.username = client.username;
     data.name = client.firstname + " " + client.lastname;
     data.dir = req.protocol + '://' + req.get('host');
     data.balance = client.balance;
-  }
 
-  else {
+  } catch(err) {
     data.errorOccured = true;
-    data.errorMessage = "Invalid user! Please try again";
+    data.errorMessage = err;
   }
 
   res.render('index', data);
@@ -90,17 +92,19 @@ app.get('/profile', function(req, res) {
 });
 
 app.post('/buystock', function(req, res) {
-  data.errorOccured = false;
+  try {
+    data.errorOccured = false;
 
-  var stockTransaction = {
-    symbol: req.body.symbol,
-    shares: parseInt(req.body.shares),
-    price: parseFloat(req.body.price)
-  };
+    var stockTransaction = {
+      symbol: req.body.symbol,
+      shares: parseInt(req.body.shares),
+      price: parseFloat(req.body.price)
+    };
 
-  var totalPrice = stockTransaction.shares * stockTransaction.price;
+    var totalPrice = stockTransaction.shares * stockTransaction.price;
 
-  if (data.balance - totalPrice >= 0) {
+    if (data.balance - totalPrice < 0) throw "Insufficient funds! Please try again.";
+
     data.transactions.push(stockTransaction);
     data.portfolioValue += totalPrice;
     data.balance -= totalPrice;
@@ -112,66 +116,52 @@ app.post('/buystock', function(req, res) {
 
       console.log("buy transaction successful!");
     });
+  } catch (err) {
+    data.errorOccured = true;
+    data.errorMessage = err;
   }
 
-  else {
-    data.errorOccured = true;
-    data.errorMessage = "Insufficient funds! Please try again.";
-  }
   res.redirect('/');
 });
 
 app.post('/sellstock', function(req, res) {
-  var stockTransaction = {
-    symbol: req.body.symbol,
-    shares: parseInt(req.body.shares),
-    price: parseFloat(req.body.price)
-  };
+  try {
+    var stockTransaction = {
+      symbol: req.body.symbol,
+      shares: parseInt(req.body.shares),
+      price: parseFloat(req.body.price)
+    };
 
-  var transaction = data.transactions.find(() => {
-    return stockTransaction.symbol;
-  });
+    var transaction = data.transactions.find(() => {
+      return stockTransaction.symbol;
+    });
 
-  if (transaction == null) {
-    data.errorOccured = true;
-    data.errorMessage = "Can't find symbol!";
-  }
+    if (transaction == null) throw "Can't find symbol!";
 
-  else {
     var sharesDifference = transaction.shares - stockTransaction.shares;
     var priceDifference = transaction.price - stockTransaction.price;
     var balanceDifference = data.balance - (stockTransaction.shares * stockTransaction.price);
 
-    if (sharesDifference >= 0 && priceDifference >= 0 && balanceDifference >= 0) {
-      transaction.shares -= stockTransaction.shares;
-      transaction.price -= stockTransaction.price;
-      data.balance -= stockTransaction.shares * stockTransaction.price;
+    if (sharesDifference < 0) throw "Insufficient shares!"
 
-      Client.updateOne({'username': data.username}, {'balance': data.balance}, function(err) {
-        if (err) {
-          console.log("an error has occured!");
-        }
+    if (priceDifference < 0) throw "Insufficient price!";
 
-        console.log("buy transaction successful!");
-      });
-    }
+    if (balanceDifference < 0) throw "Insufficient funds!";
 
-    else {
-      if (sharesDifference < 0) {
-        data.errorOccured = true;
-        data.errorMessage = "Insufficient shares!";
+    transaction.shares -= stockTransaction.shares;
+    transaction.price -= stockTransaction.price;
+    data.balance -= stockTransaction.shares * stockTransaction.price;
+
+    Client.updateOne({'username': data.username}, {'balance': data.balance}, function(err) {
+      if (err) {
+        console.log("an error has occured!");
       }
 
-      else if (priceDifference < 0) {
-        data.errorOccured = true;
-        data.errorMessage = "Insufficient price!";
-      }
-
-      else if (balanceDifference < 0) {
-        data.errorOccured = true;
-        data.errorMessage = "Insufficient funds!";
-      }
-    }
+      console.log("buy transaction successful!");
+    });
+  } catch(err) {
+    data.errorOccured = true;
+    data.errorMessage = err;
   }
 
   res.redirect('/');
