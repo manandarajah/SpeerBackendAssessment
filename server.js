@@ -48,6 +48,7 @@ app.get('/', function(req, res) {
 
 app.post('/', async function(req, res) {
 
+  //Validates client login credentials
   try {
     data.errorOccured = false;
     var username = req.body.username, password = req.body.password;
@@ -71,6 +72,7 @@ app.post('/', async function(req, res) {
   res.render('index', data);
 });
 
+//Adds balance to wallet and updates the client's record in the database
 app.post('/addbalance', function(req, res) {
   data.errorOccured = false;
   data.balance += parseFloat(req.body.newbalance);
@@ -86,21 +88,25 @@ app.post('/addbalance', function(req, res) {
   res.redirect('/');
 });
 
+//Display's client's profile and portfolio
 app.get('/profile', function(req, res) {
   data.errorOccured = false;
   res.render('profile', data);
 });
 
+//Buys stock
 app.post('/buystock', async function(req, res) {
   try {
     data.errorOccured = false;
 
+    //Creates a transaction object used to verify and proceed with buy process
     var stockTransaction = {
       symbol: req.body.symbol,
       shares: parseInt(req.body.shares),
       price: parseFloat(req.body.price)
     };
 
+    //Checks to see if symbol exists before making a purchase
     var quote = await fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+stockTransaction.symbol+'&apikey='+data.apiKey)
                         .then(response => response.json())
                         .then(json => json["Global Quote"]);
@@ -111,6 +117,7 @@ app.post('/buystock', async function(req, res) {
 
     if (data.balance - totalPrice < 0) throw "Insufficient funds! Please try again.";
 
+    //Adds transaction into array and update's a client's balance in the database
     data.transactions.push(stockTransaction);
     data.portfolioValue += totalPrice;
     data.balance -= totalPrice;
@@ -132,12 +139,15 @@ app.post('/buystock', async function(req, res) {
 
 app.post('/sellstock', async function(req, res) {
   try {
+
+    //Creates a transaction object used to verify and proceed with sell process
     var stockTransaction = {
       symbol: req.body.symbol,
       shares: parseInt(req.body.shares),
       price: parseFloat(req.body.price)
     };
 
+    //Checks to see if symbol exists before making a sell
     var quote = await fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+stockTransaction.symbol+'&apikey='+data.apiKey)
                         .then(response => response.json())
                         .then(json => json["Global Quote"]);
@@ -160,6 +170,7 @@ app.post('/sellstock', async function(req, res) {
 
     if (balanceDifference < 0) throw "Insufficient funds!";
 
+    //Modifies all data and removes it if there are exactly 0 shares. It will also update the client's balance in the database
     transaction.shares -= stockTransaction.shares;
     transaction.price -= stockTransaction.price;
     data.balance -= stockTransaction.shares * stockTransaction.price;
@@ -185,8 +196,11 @@ app.post('/sellstock', async function(req, res) {
   res.redirect('/');
 });
 
+//Logs out of client's account
 app.post('/logout', function(req, res) {
   console.log("Logging out of client account");
+
+  //Resets the data attribute before logging out
   data = {
     username: "",
     isLoggedIn: false,
