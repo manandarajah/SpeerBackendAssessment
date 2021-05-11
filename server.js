@@ -113,6 +113,7 @@ app.post('/buystock', async function(req, res) {
 
     if (Object.keys(quote).length == 0) throw "Can't find symbol!";
 
+    //Checks to see if the transaction order is affordable to the client
     var totalPrice = stockTransaction.shares * stockTransaction.price;
 
     if (data.balance - totalPrice < 0) throw "Insufficient funds! Please try again.";
@@ -137,6 +138,7 @@ app.post('/buystock', async function(req, res) {
   res.redirect('/');
 });
 
+//Sell stock
 app.post('/sellstock', async function(req, res) {
   try {
 
@@ -157,12 +159,14 @@ app.post('/sellstock', async function(req, res) {
     if (Object.keys(quote).length == 0) throw "Can't find symbol!";
     else if (quote == null) throw "Something unexpected happened! Please try again later!";
 
+    //Checks to see if the stock is purchased by the client
     var transaction = data.transactions.find(() => {
       return stockTransaction.symbol;
     });
 
     if (transaction == null) throw "Can't find symbol!";
 
+    //Validates client's stock information before selling
     var sharesDifference = transaction.shares - stockTransaction.shares;
     var priceDifference = transaction.price - stockTransaction.price;
     var balanceDifference = data.balance - (stockTransaction.shares * stockTransaction.price);
