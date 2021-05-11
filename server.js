@@ -19,7 +19,7 @@ mongoose.connect(process.env.DBHOST + process.env.DB, {useNewUrlParser: true, us
 
 //Stores all data that EJS files will need to keep it organized and allowing us to manipulate data that's necessary rather than all data
 var data = {
-  apiKey: "QW26G9WHDSW4XMUB",
+  apiKey: process.env.AV_API_KEY,
   username: "",
   isLoggedIn: false,
   errorOccured: false,

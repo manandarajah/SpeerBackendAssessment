@@ -4,14 +4,22 @@
     <meta charset="utf-8">
     <title>Speer Backend Assessment Task 2</title>
     <script type="text/javascript">
+      var symbol = "";
+      var id;
 
-      function getQuote(id) {
+      setInterval(() => {
+        getQuote(id);
+      }, 10000);
+
+      function getQuote(pId) {
+        id = pId;
         var symbol = document.getElementById(id+"symbol").value;
         document.getElementById("stockquote").innerHTML = "";
 
         if (symbol == "") {
           document.getElementById(id+"price").value = "";
           document.getElementById(id+"price").readOnly = false;
+          id = "";
         }
 
         fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+symbol+'&apikey=<%= apiKey %>')
