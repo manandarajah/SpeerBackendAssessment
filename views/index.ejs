@@ -79,6 +79,7 @@
            and live rates while user is buying or selling a stock -->
 
       <!-- Buy Stocks Form -->
+      <h2>Buy Stock</h2>
       <form class="" action="/buystock" method="post">
         <p>
           <strong>Symbol: </strong>
@@ -92,6 +93,7 @@
       </form>
 
       <!-- Sell Stocks Form -->
+      <h2>Sell Stock</h2>
       <form class="" action="/sellstock" method="post">
         <p>
           <strong>Symbol: </strong>
@@ -105,7 +107,7 @@
       </form>
 
       <!-- Get Stock Quote Endpoint -->
-      <strong>Stock Quote: </strong><br>
+      <h2>Stock Quote</h2>
       <div id="stockquote"></div>
 
       <!-- Logout Form -->
@@ -118,6 +120,7 @@
           if (errorOccured) {%>
             <p style="color: red;"><%= errorMessage %></p>
           <% } %>
+      <h1>Login to your account to get started!</h1>
       <form class="" action="/" method="post">
         <input type="text" name="username" value="" placeholder="enter username" required>
         <input type="password" name="password" value=""placeholder="enter password" required>
