@@ -1,4 +1,4 @@
-# SpeerBackendAssessment
+# Speer Backend Assessment
 
 Welcome to the Speer Backend Assessment!
 
